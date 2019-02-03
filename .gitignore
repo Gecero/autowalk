@@ -1,0 +1,6 @@
+# exclude "autowalk_found*"
+./autowalk_found*
+
+# exclude compiled files
+./a.out
+
