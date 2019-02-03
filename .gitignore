@@ -1,6 +1,7 @@
 # exclude "autowalk_found*"
-./autowalk_found*
+autowalk_*.dat
+autowalk_*.nfo
 
 # exclude compiled files
-./a.out
+a.out
 
