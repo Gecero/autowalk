@@ -19,7 +19,6 @@ const std::string AUTOWALK_VER = "0.2";
 // - make the code more self explainationary
 // - eventually c support
 // - documentation
-// - "--help" argument support
 
 std::vector<find> finds;
 
