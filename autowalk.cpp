@@ -6,10 +6,11 @@
 #include <fstream>
 #include "types.h"
 #include "filters.h"
-
+#include <cmath> // for pow
 #include <unistd.h> // for getopt
+#include <chrono> // for the "estimated time left: *" text
 
-const std::string AUTOWALK_VER = "0.2";
+const std::string AUTOWALK_VER = "0.3";
 
 // TO-DO:
 // - more filters
@@ -138,15 +139,28 @@ int main(int argc, char * argv[]) {
 		exit(1);
 	}
 	
-	debugPrint(!quiet, "1/3\treading file...");
+	debugPrint(!quiet, "1/3\topening file...");
 	std::string content = read_file(file);
 	size_t length = content.size();
+	size_t progressInterval = pow(length, 0.75);
 	
 	// BASIC FILE CONTENT PARSING //
-		
+	
+	std::chrono::high_resolution_clock::time_point timeSync1 = std::chrono::high_resolution_clock::now();
+	std::chrono::high_resolution_clock::time_point timeSync2 = std::chrono::high_resolution_clock::now();
+	
 	// do this check for every char in the file
-	debugPrint(!quiet, "2/3\tparsing file...");
 	for(uint64_t i = 0; i < length; i++) {
+		if(i % progressInterval == 0 && quiet == false) {
+			timeSync2 = std::chrono::high_resolution_clock::now();
+			double timePerLoop = (std::chrono::duration<double>(timeSync2 - timeSync1).count() / (double)progressInterval);
+			std::string tmp(43, '\0');
+			auto written = std::snprintf(&tmp[0], tmp.size(), "%06.2f%%\testimated time left:\t%013.2f", ((double)i / (double)length)*100.0f, timePerLoop*(double)(length-i));
+			tmp.resize(written);			
+			debugPrint(!quiet, "2/3\tparsing file...\t(" + tmp + "s)");
+			timeSync1 = std::chrono::high_resolution_clock::now();
+			// fun fact: using this time stopping method if the files get larger the "estimated time left" amounts get more precise
+		}
 		// check if any of the filters matches
 		for(filter f : filters) {
 			// a array to check wich chars of the text are matching the chars of the filter
@@ -172,9 +186,11 @@ int main(int argc, char * argv[]) {
 			reportFind(f);
 	}
 	
-	if(extract == true) {
+	if(extract == true && finds.size() > 0) {
 		debugPrint(!quiet, "3/3 extracting the data into files...");
 		extractData(content);
+	} else if (extract == true) {
+		debugPrint(!quiet, "3/3 there is no data to extract");
 	} else {
 		debugPrint(!quiet, "3/3 skipped data extraction");
 	}
