@@ -108,6 +108,10 @@ void extractData(std::string & content) {
 int main(int argc, char * argv[]) {
 	// BASIC FILE READING AND ARGUMENT PARSING //
 	
+	// running this code without this check and without arguments will result in a segmentation fault
+	if(argc <= 1)
+		printHelp();
+	
 	std::string file;
 	bool extract = true;
 	bool quiet = false;
