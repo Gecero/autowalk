@@ -94,12 +94,12 @@ void printHelp() {
 // extract the data and then 
 void extractData(std::string & content) {
 	if(finds.size() == 1) {
-		safe_file("autowalk_found0.dat", content, finds[0].offset, content.size());
+		safe_file("autowalk_found0" + finds[0].fileEnding, content, finds[0].offset, content.size());
 		safe_file("autowalk_found0.nfo", finds[0].type, 0, finds[0].type.length());
 	} else if(finds.size() > 1) {
 		for(int i = 0; i < finds.size(); i++) {
-			int size = i == finds.size() - 1 ? (content.length() - finds[i].offset) : finds[i+1].offset - finds[i].offset;
-			safe_file("autowalk_found" + std::to_string(i) + ".dat", content, finds[i].offset, size);
+			int size = (i == finds.size() - 1) ? (content.length() - finds[i].offset) : finds[i+1].offset - finds[i].offset;
+			safe_file("autowalk_found" + std::to_string(i) + finds[i].fileEnding, content, finds[i].offset, size);
 			safe_file("autowalk_found" + std::to_string(i) + ".nfo", finds[i].type, 0, finds[i].type.length());
 		}
 	}
@@ -180,7 +180,7 @@ int main(int argc, char * argv[]) {
 			// if all booleans added together (true = +1, false = same) equals the length of the filter
 			// or in other words, the filter applies, add the filter with offset to the "finds" vector
 			if(std::accumulate(applies, applies + f.length, 0) == f.length)
-				finds.push_back({i, std::string(f.type)});
+				finds.push_back({i, f.type, f.fileEnding});
 			
 		}
 	}
