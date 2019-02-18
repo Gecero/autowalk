@@ -3,7 +3,7 @@
 #include <cstring> // for strlen
 #include <vector>
 #include <numeric> // for std::accumulate
-#include <fstream>
+#include <iomanip> // for std::setw and std::setfill
 #include "types.h"
 #include "filters.h"
 #include <cmath> // for pow
@@ -11,6 +11,7 @@
 #include <chrono> // for the "estimated time left: *" text
 
 const std::string AUTOWALK_VER = "0.3";
+const int outputLength = 65;
 
 // TO-DO:
 // - more filters
@@ -69,7 +70,20 @@ char getChar(const char * text, uint64_t index) {
 
 // output a find
 void reportFind(find fnd) {
-	std::cout << fnd.type << "\t at offset\t" << fnd.offset << std::endl;
+	
+	
+	std::string tmp = "                                       ";
+	if(fnd.type.size() > outputLength - 15) {
+		std::cerr << "find type text too long (>" << outputLength - 15 << ")" << std::endl;
+		exit(1);
+	}
+	int index = (outputLength - 15) - fnd.type.length();
+	//std::string idk = tmp.substr(0, index) + fnd.type + "     " + "0x" + std::hex << std::setw(8) << std::setfill('0') << fnd.offset << std::endl;
+	std::cout << tmp.substr(0, index) << fnd.type << "  at " << "0x" << std::hex << std::setw(8) << std::setfill('0') << fnd.offset << std::endl;
+	
+	//auto written = std::snprintf(&tmp[0], tmp.size(), "%c", fnd.);
+	//tmp.resize(written);			
+	
 }
 
 // this function is here to prevent an unreadable code full of if's
@@ -104,6 +118,21 @@ void extractData(std::string & content) {
 		}
 	}
 }
+
+/*
+bool isBase64(const char * text, size_t len) {
+	std::vector<char> foundChars;
+	for(uint64_t i = 0; i < len; i++) {
+		auto foundChar = std::find(foundChars.begin(), foundChars.end(), text[i]);
+		if(foundChar != foundChars.end()) // char isn't already in the array
+			foundChars.push_back(foundChar[0]);
+		
+		if(foundChars.size() > 64)
+			return false;
+	}
+	std::cout << "foundChars.size()\t" << foundChars.size() << std::endl;
+	
+}*/
 
 int main(int argc, char * argv[]) {
 	// BASIC FILE READING AND ARGUMENT PARSING //
@@ -143,7 +172,7 @@ int main(int argc, char * argv[]) {
 		exit(1);
 	}
 	
-	debugPrint(!quiet, "1/3\topening file...");
+	debugPrint(!quiet, "1/3    opening file..");
 	std::string content = read_file(file);
 	size_t length = content.size();
 	size_t progressInterval = pow(length, 0.75);
@@ -153,15 +182,18 @@ int main(int argc, char * argv[]) {
 	std::chrono::high_resolution_clock::time_point timeSync1 = std::chrono::high_resolution_clock::now();
 	std::chrono::high_resolution_clock::time_point timeSync2 = std::chrono::high_resolution_clock::now();
 	
+	//if(isBase64(content.c_str(), length))
+	//	debugPrint(!quiet, "fun fact:\tfile is maybe base64 encoded");
+	
 	// do this check for every char in the file
 	for(uint64_t i = 0; i < length; i++) {
 		if(i % progressInterval == 0 && quiet == false) {
 			timeSync2 = std::chrono::high_resolution_clock::now();
 			double timePerLoop = (std::chrono::duration<double>(timeSync2 - timeSync1).count() / (double)progressInterval);
 			std::string tmp(43, '\0');
-			auto written = std::snprintf(&tmp[0], tmp.size(), "%06.2f%%\testimated time left:\t%013.2f", ((double)i / (double)length)*100.0f, timePerLoop*(double)(length-i));
+			auto written = std::snprintf(&tmp[0], tmp.size(), "%06.2f%%, estimated time left: %09.2f", ((double)i / (double)length)*100.0f, timePerLoop*(double)(length-i));
 			tmp.resize(written);			
-			debugPrint(!quiet, "2/3\tparsing file...\t(" + tmp + "s)");
+			debugPrint(!quiet, "2/3    parsing file..  (" + tmp + "s)");
 			timeSync1 = std::chrono::high_resolution_clock::now();
 			// fun fact: using this time stopping method if the files get larger the "estimated time left" amounts get more precise
 		}
@@ -191,12 +223,12 @@ int main(int argc, char * argv[]) {
 	}
 	
 	if(extract == true && finds.size() > 0) {
-		debugPrint(!quiet, "3/3 extracting the data into files...");
+		debugPrint(!quiet, "3/3    extracting the data into files..");
 		extractData(content);
 	} else if (extract == true) {
-		debugPrint(!quiet, "3/3 there is no data to extract");
+		debugPrint(!quiet, "3/3    there is no data to extract");
 	} else {
-		debugPrint(!quiet, "3/3 skipped data extraction");
+		debugPrint(!quiet, "3/3    skipped data extraction");
 	}
 	
 }
