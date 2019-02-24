@@ -71,7 +71,6 @@ char getChar(const char * text, uint64_t index) {
 // output a find
 void reportFind(find fnd) {
 	
-	
 	std::string tmp = "                                       ";
 	if(fnd.type.size() > outputLength - 15) {
 		std::cerr << "find type text too long (>" << outputLength - 15 << ")" << std::endl;
@@ -114,25 +113,28 @@ void extractData(std::string & content) {
 		for(int i = 0; i < finds.size(); i++) {
 			int size = (i == finds.size() - 1) ? (content.length() - finds[i].offset) : finds[i+1].offset - finds[i].offset;
 			safe_file("autowalk_found" + std::to_string(i) + finds[i].fileEnding, content, finds[i].offset, size);
-			safe_file("autowalk_found" + std::to_string(i) + ".nfo", finds[i].type, 0, finds[i].type.length());
+			safe_file("autowalk_found" + std::to_string(i) + ".nfo", finds[i].type, 0, finds[i].type.length());		
 		}
 	}
 }
 
-/*
 bool isBase64(const char * text, size_t len) {
-	std::vector<char> foundChars;
+	char allowedChars[66] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/+=";
 	for(uint64_t i = 0; i < len; i++) {
-		auto foundChar = std::find(foundChars.begin(), foundChars.end(), text[i]);
-		if(foundChar != foundChars.end()) // char isn't already in the array
-			foundChars.push_back(foundChar[0]);
-		
-		if(foundChars.size() > 64)
+		int index = -1;
+		for(uint64_t j = 0; j < 65; j++) {
+			if(allowedChars[j] == text[i]) {
+				index = j;
+				break;
+			}
+		}
+		if(index == -1)
 			return false;
 	}
-	std::cout << "foundChars.size()\t" << foundChars.size() << std::endl;
-	
-}*/
+	if(len % 4 == 0)
+		return true; // because real base64 encoded data length is always a multiple of 4
+	return false;
+}
 
 int main(int argc, char * argv[]) {
 	// BASIC FILE READING AND ARGUMENT PARSING //
@@ -172,7 +174,7 @@ int main(int argc, char * argv[]) {
 		exit(1);
 	}
 	
-	debugPrint(!quiet, "1/3    opening file..");
+	debugPrint(!quiet, "1/4    opening file..");
 	std::string content = read_file(file);
 	size_t length = content.size();
 	size_t progressInterval = pow(length, 0.75);
@@ -182,8 +184,9 @@ int main(int argc, char * argv[]) {
 	std::chrono::high_resolution_clock::time_point timeSync1 = std::chrono::high_resolution_clock::now();
 	std::chrono::high_resolution_clock::time_point timeSync2 = std::chrono::high_resolution_clock::now();
 	
-	//if(isBase64(content.c_str(), length))
-	//	debugPrint(!quiet, "fun fact:\tfile is maybe base64 encoded");
+	debugPrint(!quiet, "2/4    extra information gathering..");
+	std::string base64Text = isBase64(content.c_str(), length) == true ? "probably" : "probably not";
+	debugPrint(!quiet, "       file is " + base64Text + " base64 encoded");
 	
 	// do this check for every char in the file
 	for(uint64_t i = 0; i < length; i++) {
@@ -193,7 +196,7 @@ int main(int argc, char * argv[]) {
 			std::string tmp(43, '\0');
 			auto written = std::snprintf(&tmp[0], tmp.size(), "%06.2f%%, estimated time left: %09.2f", ((double)i / (double)length)*100.0f, timePerLoop*(double)(length-i));
 			tmp.resize(written);			
-			debugPrint(!quiet, "2/3    parsing file..  (" + tmp + "s)");
+			debugPrint(!quiet, "3/4    parsing file..  (" + tmp + "s)");
 			timeSync1 = std::chrono::high_resolution_clock::now();
 			// fun fact: using this time stopping method if the files get larger the "estimated time left" amounts get more precise
 		}
@@ -223,12 +226,12 @@ int main(int argc, char * argv[]) {
 	}
 	
 	if(extract == true && finds.size() > 0) {
-		debugPrint(!quiet, "3/3    extracting the data into files..");
+		debugPrint(!quiet, "4/4    extracting the data into files..");
 		extractData(content);
 	} else if (extract == true) {
-		debugPrint(!quiet, "3/3    there is no data to extract");
+		debugPrint(!quiet, "4/4    there is no data to extract");
 	} else {
-		debugPrint(!quiet, "3/3    skipped data extraction");
+		debugPrint(!quiet, "4/4    skipped data extraction");
 	}
 	
 }
