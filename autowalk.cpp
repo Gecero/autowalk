@@ -23,6 +23,15 @@ const int findReportLength = 65;
 
 std::vector<find> finds;
 
+std::string read_file(const string& fname);
+void safe_file(std::string name, std::string contents, int offset, int size);
+char getChar(const char * text, uint64_t index);
+void reportFind(find fnd);
+void debugPrint(bool print, std::string text);
+void printHelp();
+void extractData(std::string & content);
+bool isBase64(const char * text, size_t len);
+
 // thanks to @Jackojc#2309 for helping me out with file reading - btw: it's a modified version of his code
 // this function loads a whole file into a single string
 std::string read_file(const std::string& fname) {
