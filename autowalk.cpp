@@ -11,7 +11,7 @@
 #include <chrono> // for the "estimated time left: *" text
 
 const std::string AUTOWALK_VER = "0.3";
-const int outputLength = 65;
+const int findReportLength = 65;
 
 // TO-DO:
 // - more filters
@@ -70,13 +70,12 @@ char getChar(const char * text, uint64_t index) {
 
 // output a find
 void reportFind(find fnd) {
-	
 	std::string tmp = "                                       ";
-	if(fnd.type.size() > outputLength - 15) {
-		std::cerr << "find type text too long (>" << outputLength - 15 << ")" << std::endl;
+	if(fnd.type.size() > findReportLength - 15) {
+		std::cerr << "find type text too long (>" << findReportLength - 15 << ")" << std::endl;
 		exit(1);
 	}
-	int index = (outputLength - 15) - fnd.type.length();
+	int index = (findReportLength - 15) - fnd.type.length();
 	//std::string idk = tmp.substr(0, index) + fnd.type + "     " + "0x" + std::hex << std::setw(8) << std::setfill('0') << fnd.offset << std::endl;
 	std::cout << tmp.substr(0, index) << fnd.type << "  at " << "0x" << std::hex << std::setw(8) << std::setfill('0') << fnd.offset << std::endl;
 	
