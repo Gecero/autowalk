@@ -10,7 +10,6 @@
 #include <unistd.h> // for getopt
 #include <chrono> // for the "estimated time left: *" text
 
-const std::string AUTOWALK_VER = "0.3";
 const int findReportLength = 65;
 
 // TO-DO:
@@ -92,7 +91,7 @@ void debugPrint(bool print, std::string text) {
 
 // print help text and then exit(0)
 void printHelp() {
-	std::cout << "autowalk V" << AUTOWALK_VER << " help" << std::endl;
+	std::cout << "autowalk help" << std::endl;
 	std::cout << "Usage: autowalk [OPTIONS] [FILE]" << std::endl;
 	std::cout << "  -h                         write this help message" << std::endl;
 	std::cout << "  -x                         do not extract the data after file parsing" << std::endl;
