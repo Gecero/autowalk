@@ -31,6 +31,8 @@ void debugPrint(bool print, std::string text);
 void printHelp();
 void extractData(std::string & content);
 bool isBase64(const char * text, size_t len);
+char toUpper(char in);
+bool isHexadecimal(const char * text, size_t len);
 
 // thanks to @Jackojc#2309 for helping me out with file reading - btw: it's a modified version of his code
 // this function loads a whole file into a single string
