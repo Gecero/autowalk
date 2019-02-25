@@ -23,7 +23,7 @@ const int findReportLength = 65;
 
 std::vector<find> finds;
 
-std::string readFile(const string& fname);
+std::string readFile(const std::string& fname);
 void safeFile(std::string name, std::string contents, int offset, int size);
 char getChar(const char * text, uint64_t index);
 void reportFind(find fnd);
