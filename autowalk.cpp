@@ -143,6 +143,80 @@ bool isBase64(const char * text, size_t len) {
 	return false;
 }
 
+char toUpper(char in) {
+	switch(in) {
+		case 'a':
+			return 'A';
+		case 'b':
+			return 'B';
+		case 'c':
+			return 'C';
+		case 'd':
+			return 'D';
+		case 'e':
+			return 'E';
+		case 'f':
+			return 'F';
+		case 'g':
+			return 'G';
+		case 'h':
+			return 'H';
+		case 'i':
+			return 'I';
+		case 'j':
+			return 'J';
+		case 'k':
+			return 'K';
+		case 'l':
+			return 'L';
+		case 'm':
+			return 'M';
+		case 'n':
+			return 'N';
+		case 'o':
+			return 'O';
+		case 'p':
+			return 'P';
+		case 'q':
+			return 'Q';
+		case 'r':
+			return 'R';
+		case 's':
+			return 'S';
+		case 't':
+			return 'T';
+		case 'u':
+			return 'U';
+		case 'v':
+			return 'V';
+		case 'w':
+			return 'W';
+		case 'x':
+			return 'X';
+		case 'y':
+			return 'Y';
+		case 'z':
+			return 'Z';
+	}
+	return in;
+}
+
+bool isHexadecimal(const char * text, size_t len) {
+	char allowedChars[17] = "0123456789ABCDEF";
+	for(uint64_t i = 0; i < len; i++) {
+		int index = -1;
+		for(uint64_t j = 0; j < 16; j++) {
+			if(allowedChars[j] == toUpper(text[i])) {
+				index = j;
+				break;
+			}
+		}
+		if(index == -1)
+			return false;
+	}
+	return true;
+}
+
 int main(int argc, char * argv[]) {
 	// BASIC FILE READING AND ARGUMENT PARSING //
 	
@@ -192,9 +266,8 @@ int main(int argc, char * argv[]) {
 	std::chrono::high_resolution_clock::time_point timeSync2 = std::chrono::high_resolution_clock::now();
 	
 	debugPrint(!quiet, "2/4    extra information gathering..");
-	std::string base64Text = isBase64(content.c_str(), length) == true ? "probably" : "probably not";
-	debugPrint(!quiet, "       file is " + base64Text + " base64 encoded");
-	
+	debugPrint(!quiet, "       file is " + std::string(isBase64(content.c_str(), length) == true ? "probably" : "probably not") + " base64 encoded");
+	debugPrint(!quiet, "       file is " + std::string(isHexadecimal(content.c_str(), length) == true ? "probably" : "probably not") + " hexadecimal written out");
 	// do this check for every char in the file
 	for(uint64_t i = 0; i < length; i++) {
 		if(i % progressInterval == 0 && quiet == false) {
