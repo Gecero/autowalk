@@ -219,6 +219,22 @@ bool isHexadecimal(const char * text, size_t len) {
 	return true;
 }
 
+bool isPlainText(const char * text, size_t len) {
+	char disallowedChars[31] = "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0B\x0C\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F";
+	for(uint64_t i = 0; i < len; i++) {
+		int index = -1;
+		for(uint64_t j = 0; j < 31; j++) {
+			if(disallowedChars[j] == text[i]) {
+				index = j;
+				break;
+			}
+		}
+		if(index != -1)
+			return false;
+	}
+	return true;
+}
+
 int main(int argc, char * argv[]) {
 	// BASIC FILE READING AND ARGUMENT PARSING //
 	
@@ -270,6 +286,7 @@ int main(int argc, char * argv[]) {
 	debugPrint(!quiet, "2/4    extra information gathering..");
 	debugPrint(!quiet, "       file is " + std::string(isBase64(content.c_str(), length) == true ? "probably" : "probably not") + " base64 encoded");
 	debugPrint(!quiet, "       file is " + std::string(isHexadecimal(content.c_str(), length) == true ? "probably" : "probably not") + " hexadecimal written out");
+	debugPrint(!quiet, "       file is " + std::string(isPlainText(content.c_str(), length) == true ? "probably" : "probably not") + " plain text");
 	// do this check for every char in the file
 	for(uint64_t i = 0; i < length; i++) {
 		if(i % progressInterval == 0 && quiet == false) {
