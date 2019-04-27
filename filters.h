@@ -4,10 +4,10 @@
 #define FILTERS_H
 std::vector<filter> filters {
 	// compressed data - compression types
-	{"\x78\x01", 2, "zlib no/low compression compressed data", ".dat"},
-	{"\x78\x9C", 2, "zlib default compression compressed data", ".dat"},
-	{"\x78\xDA", 2, "zlib best compression compressed data", ".dat"},
-	{"\x1F\x8B", 2, "application/gzipaka. gzip compression", ".tar.gz"},
+	{"\x78\x01", 2, "zlib no/low compressed data", ".dat"},
+	{"\x78\x9C", 2, "zlib default compressed data", ".dat"},
+	{"\x78\xDA", 2, "zlib best compressed data", ".dat"},
+	{"\x1F\x8B", 2, "gzip compressed data", ".tar.gz"},
 	{"\x42\x5A\x68\x31\x31\x41\x59\x26\x53\x59", 10, "bzip2 compressed data, block size = 100k", ".bz2"}, // i added the XXXkb info as extra information and, the more important thing, to
 	{"\x42\x5A\x68\x32\x31\x41\x59\x26\x53\x59", 10, "bzip2 compressed data, block size = 200k", ".bz2"}, // confirm it's bzip using the following 6 bytes that are same for every archive
 	{"\x42\x5A\x68\x33\x31\x41\x59\x26\x53\x59", 10, "bzip2 compressed data, block size = 300k", ".bz2"},

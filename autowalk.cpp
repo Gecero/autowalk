@@ -6,6 +6,7 @@
 #include <iomanip> // for std::setw and std::setfill
 #include "types.h"
 #include "filters.h"
+#include "simplyzip.hpp"
 #include <cmath> // for pow
 #include <unistd.h> // for getopt
 #include <chrono> // for the "estimated time left: *" text
@@ -113,16 +114,37 @@ void printHelp() {
 	exit(0);
 }
 
+// an extra routine for more specific data handling
+void handleData(int findNumber, std::string & data, int offset, int size) {
+	// zlib decompression
+	if(finds[findNumber].type.substr(0, 4) == "zlib") {
+		std::string decompressed = decompress_deflate(data.substr(offset, size));
+		safeFile("autowalk_found" + std::to_string(findNumber) + "_decompressed" + ".dat", decompressed, 0, decompressed.length());
+		return;
+	}
+	
+	// gzip decompression
+	if(finds[findNumber].type.substr(0, 4) == "gzip") {
+		std::string decompressed = decompress_gzip(data.substr(offset, size));
+		safeFile("autowalk_found" + std::to_string(findNumber) + "_decompressed" + ".dat", decompressed, 0, decompressed.length());
+		return;
+	}
+}
+
 // extract the data and then 
 void extractData(std::string & content) {
 	if(finds.size() == 1) {
 		safeFile("autowalk_found0" + finds[0].fileEnding, content, finds[0].offset, content.size());
 		safeFile("autowalk_found0.nfo", finds[0].type, 0, finds[0].type.length());
+		
+		handleData(0, content, finds[0].offset, content.size());
 	} else if(finds.size() > 1) {
 		for(int i = 0; i < finds.size(); i++) {
 			int size = (i == finds.size() - 1) ? (content.length() - finds[i].offset) : finds[i+1].offset - finds[i].offset;
 			safeFile("autowalk_found" + std::to_string(i) + finds[i].fileEnding, content, finds[i].offset, size);
 			safeFile("autowalk_found" + std::to_string(i) + ".nfo", finds[i].type, 0, finds[i].type.length());		
+			
+			handleData(i, content, finds[i].offset, size);
 		}
 	}
 }
