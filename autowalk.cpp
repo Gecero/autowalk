@@ -30,8 +30,10 @@ char getChar(const char * text, uint64_t index);
 void reportFind(find fnd);
 void debugPrint(bool print, std::string text);
 void printHelp();
+void handleData(int findNumber, std::string & data, int offset, int size);
 void extractData(std::string & content);
 bool encoding_match(char * text, size_t len, encoding enc);
+int main(int argc, char * argv[]);
 
 // thanks to @Jackojc#2309 for helping me out with file reading - btw: it's a modified version of his code
 // this function loads a whole file into a single string
