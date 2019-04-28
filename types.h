@@ -12,4 +12,11 @@ struct filter {
 	std::string type;
 	std::string fileEnding;
 };
+struct encoding {
+	std::string description;
+	char * neededChars;
+	size_t neededCharsLength;
+	char * disallowedChars;
+	size_t disallowedCharsLength;
+};
 #endif

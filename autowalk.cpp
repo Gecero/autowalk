@@ -31,9 +31,7 @@ void reportFind(find fnd);
 void debugPrint(bool print, std::string text);
 void printHelp();
 void extractData(std::string & content);
-bool isBase64(const char * text, size_t len);
-char toUpper(char in);
-bool isHexadecimal(const char * text, size_t len);
+bool encoding_match(char * text, size_t len, encoding enc);
 
 // thanks to @Jackojc#2309 for helping me out with file reading - btw: it's a modified version of his code
 // this function loads a whole file into a single string
@@ -149,110 +147,39 @@ void extractData(std::string & content) {
 	}
 }
 
-bool isBase64(const char * text, size_t len) {
-	char allowedChars[66] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/+=";
+bool encoding_match(char * text, size_t len, encoding enc) {
+	signed int index;
 	for(uint64_t i = 0; i < len; i++) {
-		int index = -1;
-		for(uint64_t j = 0; j < 65; j++) {
-			if(allowedChars[j] == text[i]) {
-				index = j;
-				break;
+		
+		// if we aren't using a whitelist
+		if(enc.neededChars != nullptr) {
+			index = -1;
+			
+			for(uint64_t j = 0; j < enc.neededCharsLength; j++) {
+				if(enc.neededChars[j] == text[i]) {
+					index = j;
+					break;
+				}
 			}
+			// index didn't changed - none of the needed chars were found
+			if(index == -1)
+				return false;
 		}
-		if(index == -1)
-			return false;
-	}
-	if(len % 4 == 0)
-		return true; // because real base64 encoded data length is always a multiple of 4
-	return false;
-}
-
-char toUpper(char in) {
-	switch(in) {
-		case 'a':
-			return 'A';
-		case 'b':
-			return 'B';
-		case 'c':
-			return 'C';
-		case 'd':
-			return 'D';
-		case 'e':
-			return 'E';
-		case 'f':
-			return 'F';
-		case 'g':
-			return 'G';
-		case 'h':
-			return 'H';
-		case 'i':
-			return 'I';
-		case 'j':
-			return 'J';
-		case 'k':
-			return 'K';
-		case 'l':
-			return 'L';
-		case 'm':
-			return 'M';
-		case 'n':
-			return 'N';
-		case 'o':
-			return 'O';
-		case 'p':
-			return 'P';
-		case 'q':
-			return 'Q';
-		case 'r':
-			return 'R';
-		case 's':
-			return 'S';
-		case 't':
-			return 'T';
-		case 'u':
-			return 'U';
-		case 'v':
-			return 'V';
-		case 'w':
-			return 'W';
-		case 'x':
-			return 'X';
-		case 'y':
-			return 'Y';
-		case 'z':
-			return 'Z';
-	}
-	return in;
-}
-
-bool isHexadecimal(const char * text, size_t len) {
-	char allowedChars[17] = "0123456789ABCDEF";
-	for(uint64_t i = 0; i < len; i++) {
-		int index = -1;
-		for(uint64_t j = 0; j < 16; j++) {
-			if(allowedChars[j] == toUpper(text[i])) {
-				index = j;
-				break;
+		
+		// if we aren't using a blacklist
+		if(enc.disallowedChars != nullptr) {
+			index = -1;
+			for(uint64_t j = 0; j < enc.disallowedCharsLength; j++) {
+				if(enc.disallowedChars[j] == text[i]) {
+					index = j;
+					break;
+				}
 			}
+			// index changed - a disallowed char was found
+			if(index != -1)
+				return false;
 		}
-		if(index == -1)
-			return false;
-	}
-	return true;
-}
-
-bool isPlainText(const char * text, size_t len) {
-	char disallowedChars[31] = "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0B\x0C\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F";
-	for(uint64_t i = 0; i < len; i++) {
-		int index = -1;
-		for(uint64_t j = 0; j < 31; j++) {
-			if(disallowedChars[j] == text[i]) {
-				index = j;
-				break;
-			}
-		}
-		if(index != -1)
-			return false;
+		
 	}
 	return true;
 }
@@ -306,9 +233,9 @@ int main(int argc, char * argv[]) {
 	std::chrono::high_resolution_clock::time_point timeSync2 = std::chrono::high_resolution_clock::now();
 	
 	debugPrint(!quiet, "2/4    extra information gathering..");
-	debugPrint(!quiet, "       file is " + std::string(isBase64(content.c_str(), length) == true ? "probably" : "probably not") + " base64 encoded");
-	debugPrint(!quiet, "       file is " + std::string(isHexadecimal(content.c_str(), length) == true ? "probably" : "probably not") + " hexadecimal written out");
-	debugPrint(!quiet, "       file is " + std::string(isPlainText(content.c_str(), length) == true ? "probably" : "probably not") + " plain text");
+	for(encoding enc : encodings) {
+		debugPrint(!quiet, "       file is " + std::string(encoding_match(const_cast<char *>(content.c_str()), length, enc) == true ? "probably " : "probably not ") + enc.description);
+	}
 	// do this check for every char in the file
 	for(uint64_t i = 0; i < length; i++) {
 		if(i % progressInterval == 0 && quiet == false) {
