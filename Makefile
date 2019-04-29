@@ -1,9 +1,11 @@
 help:
 	@echo "arguments:"
-	@echo "    make install      install/download all requirements"
+	@echo "    make setup        set up all dependencies (requires internet connection)"
+	@echo "    make install      build autowalk and then make it accessable from the console"
+	@echo "                      (eg. 'autowalk a.txt' instead of './a.out a.txt')"
 	@echo "    make build        build the current code base"
 	@exit
-install:
+setup:
 	@rm -f simplyzip.hpp
 	@rm -f simplyzip.hpp.1
 	@sudo apt install wget
@@ -14,3 +16,6 @@ install:
 build:
 	g++ -std=c++11 -Wall -Wpedantic -O3 autowalk.cpp -lz
 	@exit
+install:
+	g++ -std=c++11 -Wall -Wpedantic -O3 autowalk.cpp -lz -o autowalk_tmp
+	@sudo mv ./autowalk_tmp /usr/bin/autowalk
