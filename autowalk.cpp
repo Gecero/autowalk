@@ -238,8 +238,9 @@ int main(int argc, char * argv[]) {
 	for(encoding enc : encodings) {
 		debugPrint(!quiet, "       file is " + std::string(encoding_match(const_cast<char *>(content.c_str()), length, enc) == true ? "probably " : "probably not ") + enc.description);
 	}
+	
 	// do this check for every char in the file
-	for(uint64_t i = 0; i < length; i++) {
+	for(uint64_t i = 0; i != length; i++) {
 		if(i % progressInterval == 0 && quiet == false) {
 			timeSync2 = std::chrono::high_resolution_clock::now();
 			double timePerLoop = (std::chrono::duration<double>(timeSync2 - timeSync1).count() / (double)progressInterval);
@@ -251,22 +252,21 @@ int main(int argc, char * argv[]) {
 			// fun fact: using this time stopping method if the files get larger the "estimated time left" amounts get more precise
 		}
 		// check if any of the filters matches
-		for(filter f : filters) {
-			// a array to check wich chars of the text are matching the chars of the filter
-			bool applies[f.length];
-			for(int j = 0; j < f.length; j++) {
-				applies[j] = false;
-				// if the char is equal to the char of the filter
-				// set the associated value in the "applies" array
-				if(getChar(content.c_str(), i+j) == f.pattern[j])
-					applies[j] = true;
-			}
-			
-			// if all booleans added together (true = +1, false = same) equals the length of the filter
-			// or in other words, the filter applies, add the filter with offset to the "finds" vector
-			if(std::accumulate(applies, applies + f.length, 0) == f.length)
-				finds.push_back({i, f.type, f.fileEnding});
-			
+		for(unsigned int j = 0; j != filters.size(); j++) {
+				// a array to check wich chars of the text are matching the chars of the filter
+				bool applies[filters[j].length];
+				for(unsigned int k = 0; k != filters[j].length; k++) {
+					applies[k] = false;
+					// if the char is equal to the char of the filter
+					// set the associated value in the "applies" array
+					if(getChar(content.c_str(), i+k) == filters[j].pattern[k])
+						applies[k] = true;
+				}
+				
+				// if all booleans added together (true = +1, false = same) equals the length of the filter
+				// or in other words, the filter applies, add the filter with offset to the "finds" vector
+				if(std::accumulate(applies, applies + filters[j].length, 0) == filters[j].length)
+					finds.push_back({i, filters[j].type, filters[j].fileEnding});
 		}
 	}
 	
