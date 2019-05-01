@@ -137,14 +137,24 @@ void extractData(std::string & content) {
 		safeFile("autowalk_found0" + finds[0].fileEnding, content, finds[0].offset, content.size());
 		safeFile("autowalk_found0.nfo", finds[0].type, 0, finds[0].type.length());
 		
-		handleData(0, content, finds[0].offset, content.size());
+		// we can put the try catch statement here because only one routine in the handleData
+		// function will be executed so there's no need for like one try catch statement for 
+		// each routine
+		try {
+			handleData(0, content, finds[0].offset, content.size());
+		} catch (std::exception) { std::cout << "Error while handling data, some extracted data may only be raw\n"; }
+		
 	} else if(finds.size() > 1) {
 		for(int i = 0; i < finds.size(); i++) {
 			int size = (i == finds.size() - 1) ? (content.length() - finds[i].offset) : finds[i+1].offset - finds[i].offset;
 			safeFile("autowalk_found" + std::to_string(i) + finds[i].fileEnding, content, finds[i].offset, size);
 			safeFile("autowalk_found" + std::to_string(i) + ".nfo", finds[i].type, 0, finds[i].type.length());		
 			
+			// see handleData call in the base if statement
+			try {
 			handleData(i, content, finds[i].offset, size);
+			} catch (std::exception) { std::cout << "Error while handling data, some extracted data may only be raw\n"; }
+			
 		}
 	}
 }
