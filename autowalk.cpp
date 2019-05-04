@@ -269,7 +269,7 @@ int main(int argc, char * argv[]) {
 					applies[k] = false;
 					// if the char is equal to the char of the filter
 					// set the associated value in the "applies" array
-					if(getChar(content.c_str(), i+k) == filters[j].pattern[k])
+					if(getChar(content.c_str(), i+k+filters[j].offset) == filters[j].pattern[k])
 						applies[k] = true;
 				}
 				

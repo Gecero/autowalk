@@ -7,10 +7,11 @@ struct find {
 };
 
 struct filter {
+	std::string fileEnding;
+	unsigned int offset;
 	char * pattern;
 	const size_t length;
 	std::string type;
-	std::string fileEnding;
 };
 struct encoding {
 	std::string description;
