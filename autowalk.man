@@ -1,0 +1,42 @@
+.\" Man page for autowalk
+.\" Contact me (see the contact part) if you find any typos, errors or have any ideas how to improve this manpage or my code
+.TH AUTOWALK 1 "December 2018 - May 2019" "autowalk man page" "User Commands"
+.SH NAME
+Autowalk - tool for analysing data, finding data in files and extracting it
+.SH SYNOPSIS
+autowalk [OPTIONS] [FILE]
+.SH DESCRIPTION
+Command line options:
+
+-h
+    write a short message about the usage of autowalk
+
+-x
+    do not extract the found data after file parsing
+
+-q
+    do not write info output. only write when a error occurs
+.SH EXAMPLES
+autowalk data.dat
+    will analyse data.dat and extract all data found in it
+.SH SEE ALSO
+binwalk
+    It is faster, is more precise, has more filters and is written in python.
+    If you want a more stable and reliable thing to work with, use it.
+
+file
+    A pretty basic command for determining the data type of a file.
+    If you only want to know simple information about a file, use it.
+.SH BUGS
+no bugs known yet.
+.SH AUTHOR
+Gecero
+
+Contact ways:
+
+Discord (constant):    Gecero#0553
+
+For an up-to-date list and other contant ways please see http://youtube.alpmann.de/index.php?page=info
+.SH COPYRIGHT
+none yet.
+  
