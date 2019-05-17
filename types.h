@@ -1,5 +1,6 @@
 #ifndef TYPES_H
 #define TYPES_H
+#include <string>
 struct find {
 	uint64_t offset;
 	std::string type;
